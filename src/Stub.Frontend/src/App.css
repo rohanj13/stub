@@ -1,0 +1,33 @@
+main {
+  font-family: Arial, sans-serif;
+  margin: 2rem auto;
+  max-width: 920px;
+  padding: 0 1rem 2rem;
+}
+
+section {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+input,
+button {
+  margin: 0.3rem 0;
+  padding: 0.4rem;
+  width: 100%;
+  max-width: 420px;
+  display: block;
+}
+
+pre {
+  background: #f7f7f7;
+  padding: 0.8rem;
+  border-radius: 6px;
+  overflow: auto;
+}
+
+code {
+  margin-left: 0.25rem;
+}
