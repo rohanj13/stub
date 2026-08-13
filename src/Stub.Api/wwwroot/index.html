@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stub - Digital Receipt Boilerplate</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; max-width: 920px; }
+    section { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
+    input, button { margin: 0.3rem 0; padding: 0.4rem; width: 100%; max-width: 420px; }
+    pre { background: #f7f7f7; padding: 0.8rem; border-radius: 6px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>Stub Digital Receipts (Boilerplate)</h1>
+  <p>This page exercises the .NET API for merchant setup, Square transaction webhook ingestion, customer card scan assignment, and receipt history lookup.</p>
+
+  <section>
+    <h2>1) Create Merchant</h2>
+    <input id="merchantName" placeholder="Merchant Name" value="Demo Store" />
+    <input id="merchantAccount" placeholder="Square Account Id" value="sq-account-001" />
+    <button onclick="createMerchant()">Create Merchant</button>
+  </section>
+
+  <section>
+    <h2>2) Simulate Square Transaction Webhook</h2>
+    <input id="webhookMerchantId" placeholder="Merchant Id" />
+    <input id="transactionId" placeholder="Transaction Id" value="txn-1001" />
+    <input id="orderId" placeholder="Order Id" value="order-1001" />
+    <input id="total" placeholder="Total" value="42.50" />
+    <button onclick="createReceipt()">Generate Receipt</button>
+  </section>
+
+  <section>
+    <h2>3) Assign Stub Card (Customer) to Receipt</h2>
+    <input id="receiptId" placeholder="Receipt Id" />
+    <input id="customerId" placeholder="Customer Id from card scan" value="customer-123" />
+    <button onclick="assignCustomer()">Assign Customer</button>
+  </section>
+
+  <section>
+    <h2>4) Get Receipt History by Customer</h2>
+    <input id="lookupCustomerId" placeholder="Customer Id" value="customer-123" />
+    <button onclick="lookupReceipts()">Lookup Receipts</button>
+  </section>
+
+  <h2>Result</h2>
+  <pre id="output">Ready.</pre>
+
+  <script>
+    const output = document.getElementById('output');
+    const show = (data) => output.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+
+    async function createMerchant() {
+      const response = await fetch('/api/merchants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: document.getElementById('merchantName').value,
+          posAccountId: document.getElementById('merchantAccount').value
+        })
+      });
+      const data = await response.json();
+      document.getElementById('webhookMerchantId').value = data.id || '';
+      show(data);
+    }
+
+    async function createReceipt() {
+      const response = await fetch('/api/webhooks/square/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          merchantId: document.getElementById('webhookMerchantId').value,
+          transactionId: document.getElementById('transactionId').value,
+          orderId: document.getElementById('orderId').value,
+          total: Number(document.getElementById('total').value),
+          currency: 'USD',
+          items: [{ name: 'Sample Item', unitPrice: Number(document.getElementById('total').value), quantity: 1 }]
+        })
+      });
+      const data = await response.json();
+      document.getElementById('receiptId').value = data.id || '';
+      show(data);
+    }
+
+    async function assignCustomer() {
+      const response = await fetch(`/api/receipts/${document.getElementById('receiptId').value}/assign-customer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customerId: document.getElementById('customerId').value })
+      });
+      show(await response.json());
+    }
+
+    async function lookupReceipts() {
+      const response = await fetch(`/api/customers/${encodeURIComponent(document.getElementById('lookupCustomerId').value)}/receipts`);
+      show(await response.json());
+    }
+  </script>
+</body>
+</html>
