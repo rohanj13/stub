@@ -1,0 +1,2 @@
+# stub
+Digital Receipt Infrastructure
