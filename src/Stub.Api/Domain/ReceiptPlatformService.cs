@@ -68,7 +68,7 @@ public sealed class ReceiptPlatformService
                 Name = item.Name.Trim(),
                 UnitPrice = item.UnitPrice,
                 Quantity = item.Quantity
-            }).ToArray()
+            }).ToList()
         };
 
         _dbContext.Receipts.Add(receipt);
@@ -100,11 +100,11 @@ public sealed class ReceiptPlatformService
 
     public IReadOnlyCollection<DigitalReceipt> GetReceiptsByCustomer(string customerId)
     {
-        var normalizedCustomerId = customerId.Trim();
+        var normalizedCustomerId = customerId.Trim().ToUpperInvariant();
         return _dbContext.Receipts
             .AsNoTracking()
             .Include(r => r.Items)
-            .Where(r => r.CustomerId != null && EF.Functions.ILike(r.CustomerId, normalizedCustomerId))
+            .Where(r => r.CustomerId != null && r.CustomerId.ToUpper() == normalizedCustomerId)
             .OrderByDescending(r => r.CreatedAtUtc)
             .Select(MapReceipt)
             .ToArray();
