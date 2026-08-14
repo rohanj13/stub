@@ -1,13 +1,23 @@
 using Stub.Api.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Stub.Api.Tests;
 
 public class ReceiptPlatformServiceTests
 {
+    private static ReceiptPlatformService CreateService()
+    {
+        var options = new DbContextOptionsBuilder<ReceiptPlatformDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        var context = new ReceiptPlatformDbContext(options);
+        return new ReceiptPlatformService(context);
+    }
+
     [Fact]
     public void CreateMerchant_ConnectAndProcessTransaction_CreatesReceipt()
     {
-        var service = new ReceiptPlatformService();
+        var service = CreateService();
         var merchant = service.CreateMerchant("Demo", "sq-account-1");
 
         var connected = service.ConnectMerchantToSquare(merchant.Id);
@@ -29,7 +39,7 @@ public class ReceiptPlatformServiceTests
     [Fact]
     public void AssignCustomerAndLookup_ByCustomerId_ReturnsReceipt()
     {
-        var service = new ReceiptPlatformService();
+        var service = CreateService();
         var merchant = service.CreateMerchant("Demo", "sq-account-1");
         var receipt = service.ProcessSquareTransaction(new SquareTransactionWebhook(
             merchant.Id,
@@ -50,7 +60,7 @@ public class ReceiptPlatformServiceTests
     [Fact]
     public void ProcessTransaction_WithUnknownMerchant_Throws()
     {
-        var service = new ReceiptPlatformService();
+        var service = CreateService();
 
         Assert.Throws<KeyNotFoundException>(() => service.ProcessSquareTransaction(new SquareTransactionWebhook(
             Guid.NewGuid(),
