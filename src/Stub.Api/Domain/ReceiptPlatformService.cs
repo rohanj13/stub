@@ -1,15 +1,19 @@
-using System.Collections.Concurrent;
+using Microsoft.EntityFrameworkCore;
 
 namespace Stub.Api.Domain;
 
 public sealed class ReceiptPlatformService
 {
-    private readonly ConcurrentDictionary<Guid, MerchantPortalConnection> _merchants = new();
-    private readonly ConcurrentDictionary<Guid, DigitalReceipt> _receipts = new();
+    private readonly ReceiptPlatformDbContext _dbContext;
+
+    public ReceiptPlatformService(ReceiptPlatformDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
 
     public MerchantPortalConnection CreateMerchant(string name, string posAccountId)
     {
-        var merchant = new MerchantPortalConnection
+        var merchant = new MerchantPortalConnectionEntity
         {
             Id = Guid.NewGuid(),
             Name = name.Trim(),
@@ -19,31 +23,38 @@ public sealed class ReceiptPlatformService
             CreatedAtUtc = DateTimeOffset.UtcNow
         };
 
-        _merchants[merchant.Id] = merchant;
-        return merchant;
+        _dbContext.Merchants.Add(merchant);
+        _dbContext.SaveChanges();
+        return MapMerchant(merchant);
     }
 
-    public IReadOnlyCollection<MerchantPortalConnection> GetMerchants() => _merchants.Values.OrderBy(m => m.Name).ToArray();
+    public IReadOnlyCollection<MerchantPortalConnection> GetMerchants() => _dbContext.Merchants
+        .AsNoTracking()
+        .OrderBy(m => m.Name)
+        .Select(MapMerchant)
+        .ToArray();
 
     public bool ConnectMerchantToSquare(Guid merchantId)
     {
-        if (!_merchants.TryGetValue(merchantId, out var merchant))
+        var merchant = _dbContext.Merchants.Find(merchantId);
+        if (merchant is null)
         {
             return false;
         }
 
-        _merchants[merchantId] = merchant with { WebhookRegistered = true };
+        merchant.WebhookRegistered = true;
+        _dbContext.SaveChanges();
         return true;
     }
 
     public DigitalReceipt ProcessSquareTransaction(SquareTransactionWebhook payload)
     {
-        if (!_merchants.ContainsKey(payload.MerchantId))
+        if (!_dbContext.Merchants.Any(m => m.Id == payload.MerchantId))
         {
             throw new KeyNotFoundException("Merchant is not registered.");
         }
 
-        var receipt = new DigitalReceipt
+        var receipt = new DigitalReceiptEntity
         {
             Id = Guid.NewGuid(),
             MerchantId = payload.MerchantId,
@@ -52,7 +63,7 @@ public sealed class ReceiptPlatformService
             Total = payload.Total,
             Currency = payload.Currency.Trim().ToUpperInvariant(),
             CreatedAtUtc = DateTimeOffset.UtcNow,
-            Items = payload.Items.Select(item => new ReceiptLineItem
+            Items = payload.Items.Select(item => new ReceiptLineItemEntity
             {
                 Name = item.Name.Trim(),
                 UnitPrice = item.UnitPrice,
@@ -60,30 +71,74 @@ public sealed class ReceiptPlatformService
             }).ToArray()
         };
 
-        _receipts[receipt.Id] = receipt;
-        return receipt;
+        _dbContext.Receipts.Add(receipt);
+        _dbContext.SaveChanges();
+        return MapReceipt(receipt);
     }
 
     public bool AssignCustomerToReceipt(Guid receiptId, string customerId)
     {
-        if (!_receipts.TryGetValue(receiptId, out var receipt))
+        var receipt = _dbContext.Receipts.Find(receiptId);
+        if (receipt is null)
         {
             return false;
         }
 
-        _receipts[receiptId] = receipt with { CustomerId = customerId.Trim() };
+        receipt.CustomerId = customerId.Trim();
+        _dbContext.SaveChanges();
         return true;
     }
 
-    public DigitalReceipt? GetReceipt(Guid receiptId) => _receipts.GetValueOrDefault(receiptId);
+    public DigitalReceipt? GetReceipt(Guid receiptId)
+    {
+        var receipt = _dbContext.Receipts
+            .AsNoTracking()
+            .Include(r => r.Items)
+            .FirstOrDefault(r => r.Id == receiptId);
+        return receipt is null ? null : MapReceipt(receipt);
+    }
 
     public IReadOnlyCollection<DigitalReceipt> GetReceiptsByCustomer(string customerId)
     {
-        return _receipts.Values
-            .Where(r => string.Equals(r.CustomerId, customerId, StringComparison.OrdinalIgnoreCase))
+        var normalizedCustomerId = customerId.Trim();
+        return _dbContext.Receipts
+            .AsNoTracking()
+            .Include(r => r.Items)
+            .Where(r => r.CustomerId != null && EF.Functions.ILike(r.CustomerId, normalizedCustomerId))
             .OrderByDescending(r => r.CreatedAtUtc)
+            .Select(MapReceipt)
             .ToArray();
     }
+
+    private static MerchantPortalConnection MapMerchant(MerchantPortalConnectionEntity merchant) => new()
+    {
+        Id = merchant.Id,
+        Name = merchant.Name,
+        PosAccountId = merchant.PosAccountId,
+        PosProvider = merchant.PosProvider,
+        WebhookRegistered = merchant.WebhookRegistered,
+        CreatedAtUtc = merchant.CreatedAtUtc
+    };
+
+    private static DigitalReceipt MapReceipt(DigitalReceiptEntity receipt) => new()
+    {
+        Id = receipt.Id,
+        MerchantId = receipt.MerchantId,
+        TransactionId = receipt.TransactionId,
+        OrderId = receipt.OrderId,
+        Total = receipt.Total,
+        Currency = receipt.Currency,
+        CustomerId = receipt.CustomerId,
+        CreatedAtUtc = receipt.CreatedAtUtc,
+        Items = receipt.Items
+            .Select(item => new ReceiptLineItem
+            {
+                Name = item.Name,
+                UnitPrice = item.UnitPrice,
+                Quantity = item.Quantity
+            })
+            .ToArray()
+    };
 }
 
 public sealed record MerchantPortalConnection

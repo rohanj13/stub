@@ -1,8 +1,11 @@
 using Stub.Api.Domain;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<ReceiptPlatformService>();
+builder.Services.AddDbContext<ReceiptPlatformDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddScoped<ReceiptPlatformService>();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -15,7 +18,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ReceiptPlatformDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+
 app.UseCors();
 
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }));
