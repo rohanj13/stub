@@ -62,21 +62,26 @@ Activate a versioned warranty module within the existing receipt envelope: merch
 ## 7. Acceptance Criteria
 
 **Story: Attach warranty to a receipt**
+
 - [ ] Given an existing receipt with no warranty module, When warranty metadata (product reference, coverage window, terms reference) is submitted, Then the module is stored under the receipt's envelope with `moduleVersion` set to 1.
 - [ ] Given a coverage end date earlier than the start date, When warranty metadata is submitted, Then the request is rejected with a deterministic validation error and no module is stored.
 
 **Story: Read warranty metadata**
+
 - [ ] Given a receipt with an attached warranty module, When the warranty module is requested, Then the product reference, coverage window, terms reference, and module version are returned.
 - [ ] Given a receipt with no warranty module attached, When the warranty module is requested, Then a null/absent result is returned, not an error.
 
 **Story: Update warranty metadata**
+
 - [ ] Given a receipt with an existing warranty module, When updated warranty metadata is submitted, Then the module's fields are replaced, `moduleVersion` is incremented, and an updated-at timestamp is recorded.
 
 **Story: Core receipt integrity preserved**
+
 - [ ] Given a receipt with an attached warranty module, When the core receipt (totals, line items, currency, state) is retrieved, Then its values are identical to what they were before the warranty module was attached.
 - [ ] Given a receipt with both a warranty and a loyalty module attached, When the warranty module is updated, Then the loyalty module's data remains unchanged.
 
 **Story: Not-found handling**
+
 - [ ] Given a receipt id that does not exist, When a warranty attach/update request targets it, Then the response is a deterministic not-found error and no module is created.
 
 ## 8. Out of Scope

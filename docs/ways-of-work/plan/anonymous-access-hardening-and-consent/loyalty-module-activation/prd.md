@@ -63,21 +63,26 @@ Activate a versioned loyalty module within the existing receipt envelope: mercha
 ## 7. Acceptance Criteria
 
 **Story: Attach loyalty participation to a receipt**
+
 - [ ] Given an existing receipt with no loyalty module, When a valid program reference and participation status are submitted, Then the module is stored under the receipt's envelope with `moduleVersion` set to 1.
 - [ ] Given an unrecognized participation status value, When submitted, Then the request is rejected with a deterministic validation error and no module is stored.
 
 **Story: Read loyalty metadata**
+
 - [ ] Given a receipt with an attached loyalty module, When the loyalty module is requested, Then the program reference, participation status, and module version are returned.
 - [ ] Given a receipt with no loyalty module attached, When the loyalty module is requested, Then a null/absent result is returned, not an error.
 
 **Story: Update loyalty participation status**
+
 - [ ] Given a receipt with an existing loyalty module in "pending" status, When the status is updated to "enrolled", Then the module's status field is updated, `moduleVersion` is incremented, and an updated-at timestamp is recorded.
 
 **Story: Core receipt and cross-module integrity preserved**
+
 - [ ] Given a receipt with an attached loyalty module, When the core receipt (totals, line items, currency, state) is retrieved, Then its values are identical to what they were before the loyalty module was attached.
 - [ ] Given a receipt with both a warranty and a loyalty module attached, When the loyalty module is updated, Then the warranty module's data remains unchanged.
 
 **Story: Not-found handling**
+
 - [ ] Given a receipt id that does not exist, When a loyalty attach/update request targets it, Then the response is a deterministic not-found error and no module is created.
 
 ## 8. Out of Scope

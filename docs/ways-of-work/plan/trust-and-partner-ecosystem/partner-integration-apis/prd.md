@@ -66,21 +66,27 @@ Build a Partner API Gateway that issues scoped client credentials to approved th
 ## 7. Acceptance Criteria
 
 **Story: Partner registration and scoped token issuance**
+
 - [ ] Given an approved partner client is registered with a defined scope, When the partner requests a token, Then a signed, time-bound token encoding only that client's allowed scope is issued.
 
 **Story: Customer grants scoped access**
+
 - [ ] Given a partner requests access to a customer's receipts from a specific merchant, When the customer approves the request with an expiration, Then an active access grant is created covering exactly that merchant scope and expiration.
 
 **Story: Partner call succeeds within granted scope**
+
 - [ ] Given a partner holds a valid token and an active grant covering the requested customer/merchant/data type, When the partner calls the API, Then the response contains only data within that scope and an audit record is written with outcome "success."
 
 **Story: Partner call denied — expired or revoked grant**
+
 - [ ] Given a partner's access grant has expired or been revoked, When the partner calls the API, Then the request is denied with a deterministic error distinguishing "expired" from "revoked," and an audit record is written with the denial reason.
 
 **Story: Partner call denied — out-of-scope request**
+
 - [ ] Given a partner's token/grant does not cover the requested merchant or data type, When the partner calls the API, Then the request is denied and no data outside the granted scope is returned.
 
 **Story: Customer views and revokes a grant**
+
 - [ ] Given a customer has one or more active partner grants, When the customer requests their grant list, Then all active grants are returned; When the customer revokes a specific grant, Then subsequent partner calls relying on that grant are denied within the documented time window.
 
 ## 8. Out of Scope

@@ -65,21 +65,26 @@ Introduce a first-class consent record: a customer can grant a merchant permissi
 ## 7. Acceptance Criteria
 
 **Story: Grant consent**
+
 - [ ] Given a customer supplies a valid contact channel, value, purpose, and version, When consent is granted, Then a consent record is created with a granted-at timestamp and no revoked-at value.
 - [ ] Given a grant request with a missing contact value or empty purpose, When submitted, Then the response is a deterministic validation error and no record is created.
 
 **Story: List active consent grants**
+
 - [ ] Given a customer has one active and one revoked grant for a merchant, When active grants are listed, Then only the active grant is returned.
 
 **Story: Revoke consent**
+
 - [ ] Given an active consent grant, When the customer revokes it, Then the record's revoked-at timestamp is set and it no longer appears in the active-grants list.
 - [ ] Given a revoked grant, When an enforcement check is performed for that channel/purpose, Then the check reports no active consent.
 
 **Story: Enforcement blocks unconsented use**
+
 - [ ] Given no active consent record exists for a given customer/merchant/purpose/channel, When a contact-channel-consuming action checks for consent, Then the check reports no active consent and the action is rejected deterministically.
 - [ ] Given an active consent record exists, When the enforcement check is performed for the matching purpose/channel, Then the check reports active consent and the action is permitted to proceed.
 
 **Story: Data segregation**
+
 - [ ] Given a customer has granted consent with a contact value, When the Phase 1 baseline receipt or history response is generated, Then the contact value does not appear in that response.
 
 ## 8. Out of Scope

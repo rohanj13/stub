@@ -57,15 +57,19 @@ Harden the claim endpoint to enforce the `Claimable → Claimed` transition expl
 ## 7. Acceptance Criteria
 
 **Story: Successful claim**
+
 - [ ] Given a `Claimable` receipt, When a customer identifier is submitted to the claim endpoint, Then the receipt transitions to `Claimed` with `ClaimedAtUtc` set and the response confirms success.
 
 **Story: Claim attempted before receipt is claimable**
+
 - [ ] Given a receipt still in `Pending` state, When a claim is attempted, Then the response indicates the receipt is not yet ready and is retryable, and no assignment occurs.
 
 **Story: Claim attempted on unknown receipt**
+
 - [ ] Given a receipt id that does not exist, When a claim is attempted, Then the response is `404 Not Found`.
 
 **Story: Re-claim conflict**
+
 - [ ] Given a receipt already `Claimed` by customer A, When customer B attempts to claim it, Then the request is rejected with a conflict response and the original assignment is unchanged.
 - [ ] Given a receipt already `Claimed` by customer A, When customer A's identifier is submitted again, Then the response is a success (idempotent) with no state change beyond the existing claim.
 

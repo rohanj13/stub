@@ -54,13 +54,16 @@ Add a merchant-level branding preferences record (display name, logo reference, 
 ## 7. Acceptance Criteria
 
 **Story: Set branding preferences**
+
 - [ ] Given a registered merchant, When branding preferences are submitted with a display name, logo reference, and message, Then they are persisted and returned on subsequent get requests.
 - [ ] Given a message exceeding the max length, When an update is submitted, Then the response is `400 Bad Request` and no partial update is saved.
 
 **Story: Compliance fields are protected**
+
 - [ ] Given any branding configuration, When a receipt is rendered/retrieved, Then totals, currency, transaction id, timestamps, and line items are always present and unaffected by branding content.
 
 **Story: Receipt includes branding on retrieval**
+
 - [ ] Given a merchant with branding preferences set, When a receipt for that merchant is retrieved by id, Then the response includes the merchant's branding alongside the core receipt fields.
 - [ ] Given a merchant with no branding preferences set, When a receipt is retrieved, Then the response falls back to the merchant's registered name with no logo/message.
 

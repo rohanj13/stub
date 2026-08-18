@@ -62,18 +62,23 @@ Introduce a POS Adapter abstraction (`IPosAdapter`) that normalizes a provider-s
 ## 7. Acceptance Criteria
 
 **Story: Square ingestion unaffected by refactor**
+
 - [ ] Given the existing Square webhook ingestion is refactored to implement `IPosAdapter`, When a valid Square transaction event is received, Then the resulting receipt, claimability state, and response contract are identical to pre-refactor behavior.
 
 **Story: New provider adapter normalizes correctly**
+
 - [ ] Given a merchant is configured to use the additional POS provider's adapter, When a valid transaction event from that provider is received, Then it is normalized into the core receipt/envelope shape and the receipt becomes `claimable` through the existing state machine.
 
 **Story: Invalid payload from a new adapter is rejected consistently**
+
 - [ ] Given a malformed or invalid payload is received for a merchant using the additional provider's adapter, When ingestion is attempted, Then the payload is rejected using the same error semantics as an equivalent invalid Square payload.
 
 **Story: Provider routing by merchant configuration**
+
 - [ ] Given a merchant is configured for a specific POS provider, When a transaction event arrives, Then it is routed to and processed by that provider's adapter and no other.
 
 **Story: Downstream pipeline unchanged for new provider receipts**
+
 - [ ] Given a receipt originated from the additional provider's adapter, When claim, history retrieval, envelope module access, or compliance evaluation is performed on it, Then behavior is identical to a receipt originated from Square.
 
 ## 8. Out of Scope

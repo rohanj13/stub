@@ -61,18 +61,23 @@ Add a Receipt Signing & Verification Service that computes a deterministic hash/
 ## 7. Acceptance Criteria
 
 **Story: Receipt is signed at issuance for an enabled merchant**
+
 - [ ] Given a merchant with verification enabled, When a new receipt is ingested, Then a signature/hash is computed and stored in the reserved verification fields alongside the algorithm and canonicalization version.
 
 **Story: Verification succeeds for an unaltered receipt**
+
 - [ ] Given a signed receipt whose core fields have not changed since signing, When verification is requested, Then the result is `valid`.
 
 **Story: Verification fails for an altered receipt**
+
 - [ ] Given a signed receipt whose stored signature no longer matches its current core field values, When verification is requested, Then the result is `invalid`.
 
 **Story: Verification on a pre-rollout receipt**
+
 - [ ] Given a receipt issued before verification was enabled for its merchant, When verification is requested, Then the result is `unverifiable` and no error is raised.
 
 **Story: Phased enablement does not affect other merchants**
+
 - [ ] Given verification is enabled for Merchant A but not Merchant B, When a new receipt is issued for Merchant B, Then no signature is computed and existing Merchant B endpoint behavior is unchanged.
 
 ## 8. Out of Scope

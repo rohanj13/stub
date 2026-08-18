@@ -55,13 +55,16 @@ Introduce a versioned, optional "envelope" container alongside the core receipt 
 ## 7. Acceptance Criteria
 
 **Story: Envelope is optional**
+
 - [ ] Given a receipt created without envelope content, When it is retrieved, Then the response is valid and simply omits/empties the envelope field.
 
 **Story: Envelope does not affect core validity**
+
 - [ ] Given a receipt with arbitrary (valid-shaped) envelope content, When core fields are read, Then they are unaffected by envelope content.
 - [ ] Given malformed envelope content (not a JSON object, or missing `version`), When a receipt is created/updated with it, Then the request is rejected with a deterministic error and the core receipt is not persisted in a partial state.
 
 **Story: Envelope is versioned and extensible**
+
 - [ ] Given an envelope with `version: 1`, When a new module key is introduced in a later feature, Then no migration is required for existing receipts lacking that key.
 
 ## 8. Out of Scope

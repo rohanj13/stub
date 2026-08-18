@@ -65,23 +65,29 @@ Introduce a tiered response model for history requests: a minimal baseline view 
 ## 7. Acceptance Criteria
 
 **Story: Baseline view without challenge**
+
 - [ ] Given a valid stub identifier, When history is requested without a verified challenge, Then a minimal baseline view (no line-item detail) is returned successfully.
 
 **Story: Challenge issuance**
+
 - [ ] Given a valid stub identifier, When a challenge is issued, Then a challenge reference is returned and, for code-based challenges, a one-time code is delivered via the notification interface and only its salted hash is persisted.
 - [ ] Given a challenge issuance, When it is logged, Then the audit entry records identifier, timestamp, challenge type, and "issued" outcome without the raw code.
 
 **Story: Successful verification unlocks full history**
+
 - [ ] Given a valid, unexpired challenge and a correct proof, When verification is submitted, Then a verified reference/token is returned and the full-history endpoint returns complete receipt detail when that reference/token is presented.
 
 **Story: Failed or expired verification is rejected**
+
 - [ ] Given an incorrect proof, When verification is submitted, Then the response is a deterministic failure that does not reveal which field was wrong, and the attempt is logged as "failed."
 - [ ] Given an expired or already-consumed challenge, When verification is attempted, Then the response is a deterministic failure and the attempt is logged as "expired" or rejected as already-used.
 
 **Story: Independent rate limiting**
+
 - [ ] Given repeated challenge issuance or verification attempts for the same identifier beyond the configured threshold, When an additional attempt is made, Then the response is `429 Too Many Requests`, independent of the Phase 1 history endpoint's own rate limit.
 
 **Story: Full history requires a verified challenge**
+
 - [ ] Given no verified challenge reference/token is presented, When full history is requested, Then the request is rejected with a deterministic error rather than returning full data or silently degrading to baseline without indication.
 
 ## 8. Out of Scope

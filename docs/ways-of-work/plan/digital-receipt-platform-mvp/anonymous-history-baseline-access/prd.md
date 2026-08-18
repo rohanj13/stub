@@ -57,17 +57,21 @@ Add baseline possession/risk controls around history retrieval: rate limiting pe
 ## 7. Acceptance Criteria
 
 **Story: Retrieve own history**
+
 - [ ] Given a valid stub identifier with existing receipts, When history is requested, Then the receipts are returned ordered by most recent first.
 - [ ] Given a valid stub identifier with no receipts, When history is requested, Then an empty list is returned (not an error).
 
 **Story: Reject invalid identifier**
+
 - [ ] Given an empty or whitespace identifier, When history is requested, Then the response is `400 Bad Request`.
 
 **Story: Rate limiting**
+
 - [ ] Given more than the configured threshold of requests for the same identifier within the configured window, When an additional request is made, Then the response is `429 Too Many Requests`.
 - [ ] Given a rate-limited request, When it occurs, Then it is logged as "rate-limited" in the audit trail.
 
 **Story: Audit logging**
+
 - [ ] Given any retrieval attempt (successful, rate-limited, or invalid), When it completes, Then an audit log entry is recorded with identifier, timestamp, and outcome, and without exposing full receipt contents in the log.
 
 ## 8. Out of Scope

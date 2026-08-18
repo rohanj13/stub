@@ -62,21 +62,27 @@ Introduce a Compliance Profile service that lets Compliance/Legal define, versio
 ## 7. Acceptance Criteria
 
 **Story: Define and activate a new compliance profile**
+
 - [ ] Given Compliance/Legal defines a new profile with required fields for a region, When the profile is activated for a merchant, Then subsequently issued receipts for that merchant are evaluated against it.
 
 **Story: Receipt evaluated as compliant**
+
 - [ ] Given a merchant's active profile requires a specific set of fields, When a receipt is issued containing all required fields in the correct format, Then the evaluation status is `compliant`.
 
 **Story: Receipt evaluated as missing fields**
+
 - [ ] Given a merchant's active profile requires a field the receipt does not contain, When the receipt is issued, Then the evaluation status is `missing-fields`, and the receipt still becomes `claimable` normally.
 
 **Story: No active profile**
+
 - [ ] Given a merchant has no active compliance profile configured, When a receipt is issued, Then the evaluation status is `not-evaluated` and no other behavior changes.
 
 **Story: Profile version change does not retroactively affect prior evaluations**
+
 - [ ] Given a merchant's profile is updated to a new version, When a previously evaluated receipt's evaluation record is inspected, Then it still reflects the profile version active at the time it was evaluated.
 
 **Story: On-demand re-evaluation**
+
 - [ ] Given a receipt was evaluated under an older profile version, When an operator triggers re-evaluation against the current active profile, Then a new evaluation record is created reflecting the current profile version, without overwriting the original.
 
 ## 8. Out of Scope

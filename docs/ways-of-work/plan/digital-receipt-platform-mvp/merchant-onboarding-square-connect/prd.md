@@ -13,7 +13,7 @@ Merchant Onboarding & Square Connect
 
 ### Problem
 
-A merchant cannot receive any transaction-derived receipts until their store exists in Stub and is linked to their Square account. Today the platform supports creating a merchant record and a "connect to Square" action that flips a `WebhookRegistered` flag, but there is no guided onboarding flow, no visibility into *why* a merchant isn't webhook-ready, and no validation that the POS account id is well-formed before it's relied upon by ingestion.
+A merchant cannot receive any transaction-derived receipts until their store exists in Stub and is linked to their Square account. Today the platform supports creating a merchant record and a "connect to Square" action that flips a `WebhookRegistered` flag, but there is no guided onboarding flow, no visibility into _why_ a merchant isn't webhook-ready, and no validation that the POS account id is well-formed before it's relied upon by ingestion.
 
 ### Solution
 
@@ -57,16 +57,19 @@ Provide a clear onboarding flow — create merchant profile, connect to Square, 
 ## 7. Acceptance Criteria
 
 **Story: Create merchant profile**
+
 - [ ] Given valid `Name` and `PosAccountId`, When a merchant is created, Then a merchant record is persisted with `WebhookRegistered = false` and returned with `201 Created`.
 - [ ] Given a missing `Name` or `PosAccountId`, When creation is attempted, Then the response is `400 Bad Request` and no record is created.
 - [ ] Given a `PosAccountId` already registered for Square, When creation is attempted again, Then the request is rejected without creating a duplicate.
 
 **Story: Connect to Square**
+
 - [ ] Given an existing merchant, When "connect to Square" is invoked, Then `WebhookRegistered` becomes `true` and the response confirms `webhookRegistered: true`.
 - [ ] Given an unknown merchant id, When "connect to Square" is invoked, Then the response is `404 Not Found`.
 - [ ] Given an already-connected merchant, When "connect to Square" is invoked again, Then the response still confirms `webhookRegistered: true` without error.
 
 **Story: List merchants and integration state**
+
 - [ ] Given one or more merchants exist, When the list endpoint is called, Then all merchants are returned ordered by name with their current webhook-registered state.
 
 ## 8. Out of Scope

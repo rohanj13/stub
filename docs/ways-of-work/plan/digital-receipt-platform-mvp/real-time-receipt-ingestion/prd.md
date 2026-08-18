@@ -64,18 +64,22 @@ Harden the existing ingestion endpoint into a reliable, idempotent pipeline that
 ## 7. Acceptance Criteria
 
 **Story: Receipt becomes claimable immediately after transaction**
+
 - [ ] Given a valid webhook payload for a registered merchant, When the webhook is received, Then a receipt is persisted with state `Claimable` and a `ClaimableAtUtc` timestamp in the response.
 - [ ] Given a successful ingestion, When latency is measured, Then the ingest-to-claimable duration is recorded and available for percentile reporting.
 
 **Story: Duplicate webhook delivery is ignored**
+
 - [ ] Given a receipt already exists for a given `(MerchantId, TransactionId)`, When the same webhook payload is delivered again, Then no second receipt is created and the response references the original receipt.
 - [ ] Given a duplicate delivery occurs, When it is processed, Then the outcome is logged as "duplicate-ignored" rather than "success" or an unhandled error.
 
 **Story: Malformed or unauthorized payloads are rejected**
+
 - [ ] Given a webhook payload missing `TransactionId` or `Currency`, When it is submitted, Then the response is `400 Bad Request` and no receipt is created.
 - [ ] Given a webhook payload referencing an unregistered `MerchantId`, When it is submitted, Then the response is `404 Not Found` and no receipt is created.
 
 **Story: Line items are persisted accurately**
+
 - [ ] Given a payload with N line items, When the receipt is created, Then exactly N line items are persisted with matching name, unit price, and quantity.
 
 ## 8. Out of Scope
