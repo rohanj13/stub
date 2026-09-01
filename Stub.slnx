@@ -1,8 +1,13 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Stub.Api/Stub.Api.csproj" />
+    <Project Path="src/Stub.Application/Stub.Application.csproj" />
+    <Project Path="src/Stub.Domain/Stub.Domain.csproj" />
+    <Project Path="src/Stub.Infrastructure/Stub.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Stub.Api.Tests/Stub.Api.Tests.csproj" />
+    <Project Path="tests/Stub.Application.Tests/Stub.Application.Tests.csproj" />
+    <Project Path="tests/Stub.Domain.Tests/Stub.Domain.Tests.csproj" />
   </Folder>
 </Solution>
