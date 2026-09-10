@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Stub.Infrastructure.Persistence;
+using Stub.Infrastructure.Providers.Abstractions;
+using Stub.Infrastructure.Providers.Square;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,13 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddDbContext<StubDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+builder.Services.Configure<SquareOptions>(builder.Configuration.GetSection(SquareOptions.SectionName));
+builder.Services.AddHttpClient<SquarePosTransactionAdapter>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+builder.Services.AddScoped<IPosTransactionAdapter>(provider => provider.GetRequiredService<SquarePosTransactionAdapter>());
+builder.Services.AddScoped<IPosTransactionAdapterResolver, PosTransactionAdapterResolver>();
 
 builder.Services.AddCors(options =>
 {
