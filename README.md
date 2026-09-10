@@ -153,6 +153,7 @@ Provider structure for POS integrations:
 ```
 Stub.Infrastructure/Providers/
   Square/
+    SquarePosTransactionAdapter.cs
     SquareWebhookHandler.cs
     SquareReceiptMapper.cs
   Shopify/
@@ -163,7 +164,7 @@ Stub.Infrastructure/Providers/
 
 ### Intended Flow
 
-1. Square Webhook → RawTransaction → SquareReceiptMapper → Receipt → ReceiptAssignment
+1. Square Webhook → SquarePosTransactionAdapter (Square API) → RawTransaction → SquareReceiptMapper → Receipt → ReceiptAssignment
 
 ## Configuration
 
@@ -176,6 +177,15 @@ Update `appsettings.json`:
   }
 }
 ```
+
+Provide Square sandbox API key via environment variable:
+
+```bash
+cp .env.example .env
+# then set SQUARE_SANDBOX_API_KEY in .env
+```
+
+The API reads this value through `Square__AccessToken`.
 
 ## What's Implemented
 
@@ -192,6 +202,7 @@ Update `appsettings.json`:
 
 - EF Core migrations (create with `dotnet ef migrations add`)
 - Square integration (handlers are placeholders)
+- Square receipt mapping (mapper is still a placeholder)
 - Authentication and authorization
 - Background job processing
 - Email notifications
