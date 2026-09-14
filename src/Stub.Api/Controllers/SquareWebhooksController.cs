@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Square;
 using Stub.Domain.Entities;
 using Stub.Domain.Enums;
 using Stub.Infrastructure.Persistence;
@@ -33,7 +34,7 @@ public class SquareWebhooksController : ControllerBase
         {
             return Problem(title: "Square integration is not configured", detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
         }
-        catch (HttpRequestException ex)
+        catch (SquareApiException ex)
         {
             return Problem(title: "Square API request failed", detail: ex.Message, statusCode: StatusCodes.Status502BadGateway);
         }

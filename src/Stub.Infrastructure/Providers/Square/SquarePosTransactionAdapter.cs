@@ -1,5 +1,7 @@
-using System.Net.Http.Headers;
+using System.Text.Json;
 using Microsoft.Extensions.Options;
+using Square;
+using Square.Payments;
 using Stub.Domain.Enums;
 using Stub.Infrastructure.Providers.Abstractions;
 
@@ -7,12 +9,12 @@ namespace Stub.Infrastructure.Providers.Square;
 
 public class SquarePosTransactionAdapter : IPosTransactionAdapter
 {
-    private readonly HttpClient _httpClient;
+    private readonly ISquareClient _squareClient;
     private readonly SquareOptions _options;
 
-    public SquarePosTransactionAdapter(HttpClient httpClient, IOptions<SquareOptions> options)
+    public SquarePosTransactionAdapter(ISquareClient squareClient, IOptions<SquareOptions> options)
     {
-        _httpClient = httpClient;
+        _squareClient = squareClient;
         _options = options.Value;
     }
 
@@ -25,23 +27,15 @@ public class SquarePosTransactionAdapter : IPosTransactionAdapter
             throw new InvalidOperationException("Square access token is not configured. Set Square__AccessToken via environment variables.");
         }
 
-        _httpClient.BaseAddress = new Uri(_options.BaseUrl);
+        var response = await _squareClient.Payments.GetAsync(
+            new GetPaymentsRequest { PaymentId = externalTransactionId },
+            cancellationToken: cancellationToken);
 
-        using var request = new HttpRequestMessage(HttpMethod.Get, $"v2/payments/{Uri.EscapeDataString(externalTransactionId)}");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.AccessToken);
-        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        using var response = await _httpClient.SendAsync(request, cancellationToken);
-        var content = await response.Content.ReadAsStringAsync(cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
+        if (response.Payment is null)
         {
-            throw new HttpRequestException(
-                $"Square API returned {(int)response.StatusCode} when fetching transaction '{externalTransactionId}'. Body: {content}",
-                null,
-                response.StatusCode);
+            throw new InvalidOperationException($"Square payment '{externalTransactionId}' was not returned by the API.");
         }
 
-        return content;
+        return JsonSerializer.Serialize(response.Payment);
     }
 }
